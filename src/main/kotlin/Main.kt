@@ -73,9 +73,19 @@ fun main(vararg args: String) {
                             put("procVersion", results[7])
                             put("baseBand", results[8].toByteArray().toUHexString("").lowercase())
                             put("version", buildJsonObject {
-                                put("incremental", "5891938")
-                                put("release", "10")
-                                put("codename", "REL")
+                                val version = arrayListOf<String>()
+                                arrayOf(
+                                    "adb.exe shell getprop ro.product.build.version.incremental",
+                                    "adb.exe shell getprop ro.product.build.version.release",
+                                    "adb.exe shell getprop ro.build.version.codename"
+                                ).forEach {
+                                    Runtime.getRuntime().exec(it).inputStream.use { input ->
+                                        version.add(input.bufferedReader().readLine())
+                                    }
+                                }
+                                put("incremental", version[0])
+                                put("release", version[1])
+                                put("codename", version[2])
                             })
                             put("simInfo", "T-Mobile")
                             put("osType", "android")
